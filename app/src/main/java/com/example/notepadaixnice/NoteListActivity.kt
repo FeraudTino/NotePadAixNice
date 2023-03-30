@@ -1,6 +1,7 @@
 package com.example.notepadaixnice
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class NoteListActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var notes:MutableList<Note>
@@ -16,10 +18,13 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_note_list)
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        findViewById<FloatingActionButton>(R.id.create_note_fab).setOnClickListener(this)
 
         notes = mutableListOf<Note>()
 
@@ -35,18 +40,55 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
         recyclerView.adapter = adapter
 
     }
-    @SuppressLint("SuspiciousIndentation")
-    override fun onClick(view: View) {
-        if (view.tag != null)
-            Log.i("NoteListActivity", "Note de ma list")
-            showNoteDetail(view.tag as Int)
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK || data == null) {
+            return
+        }
+        when (requestCode) {
+            NoteDetailActivity.REQUEST_EDIT_NOTE -> processEditNoteResult(data)
+        }
     }
 
+    private fun processEditNoteResult(data: Intent) {
+        val noteIndex = data.getIntExtra(NoteDetailActivity.EXTRA_NOTE_INDEX,-1)
+        val note = data.getParcelableExtra<Note>(NoteDetailActivity.EXTRA_NOTE)!!
+        saveNote(note, noteIndex)
+    }
+
+    fun saveNote(note: Note, noteIndex: Int) {
+        if(noteIndex < 0) {
+            notes.add(0, note)
+        } else {
+            notes[noteIndex] = note
+        }
+        adapter.notifyDataSetChanged()
+    }
+
+    @SuppressLint("SuspiciousIndentation")
+    override fun onClick(view: View) {
+        if (view.tag != null) {
+            Log.i("NoteListActivity", "Note de ma list")
+            showNoteDetail(view.tag as Int)
+        }else {
+            when(view.id) {
+                R.id.create_note_fab -> createNewNote()
+            }
+        }
+    }
+
+    private fun createNewNote() {
+        showNoteDetail(-1)
+    }
+
+
     fun showNoteDetail(noteIndex: Int) {
-        val note = notes[noteIndex]
+        val note = if(noteIndex < 0) Note() else notes[noteIndex]
         val intent = Intent(this, NoteDetailActivity::class.java)
         intent.putExtra(NoteDetailActivity.EXTRA_NOTE, note)
         intent.putExtra(NoteDetailActivity.EXTRA_NOTE_INDEX, noteIndex)
-        startActivity(intent)
+        //startActivity(intent)
+        startActivityForResult(intent, NoteDetailActivity.REQUEST_EDIT_NOTE)
     }
 }
