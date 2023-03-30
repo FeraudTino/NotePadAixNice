@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -19,6 +18,9 @@ class NoteDetailActivity : AppCompatActivity() {
         val REQUEST_EDIT_NOTE = 1
         val EXTRA_NOTE = "note"
         val EXTRA_NOTE_INDEX = "noteIndex"
+
+        val ACTION_SAVE_NOTE = "com.example.notepadaixnice.actions.ACTION_SAVE_NOTE"
+        val ACTION_DELETE_NOTE = "com.example.notepadaixnice.actions.ACTION_DELETE_NOTE"
     }
 
     lateinit var note: Note
@@ -62,15 +64,37 @@ class NoteDetailActivity : AppCompatActivity() {
                 saveNote()
                 return true
             }
+            R.id.action_delete -> {
+                showConfirmDeleteNoteDialog()
+                return true
+            }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+    private fun showConfirmDeleteNoteDialog() {
+        val confirmFragment = note.title?.let { ConfirmDeleteNoteFragment(it) }
+        confirmFragment?.listner = object : ConfirmDeleteNoteFragment.ConfirmDeleteDialogueListner{
+            override fun onDialoguePositiveClick() {
+                deleteNote()
+            }
+
+            override fun onDialogueNegativeClick() {}
+        }
+        confirmFragment?.show(supportFragmentManager, "confirmDeleteDialog")
     }
 
     fun saveNote() {
         note.title = titleView.text.toString()
         note.text = textView.text.toString()
-        intent = Intent()
+        intent = Intent(ACTION_SAVE_NOTE)
         intent.putExtra(EXTRA_NOTE, note)
+        intent.putExtra(EXTRA_NOTE_INDEX, noteIndex)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+    }
+
+    fun deleteNote() {
+        intent = Intent(ACTION_DELETE_NOTE)
         intent.putExtra(EXTRA_NOTE_INDEX, noteIndex)
         setResult(Activity.RESULT_OK, intent)
         finish()
