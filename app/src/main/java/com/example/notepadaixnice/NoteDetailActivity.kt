@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
@@ -60,28 +61,32 @@ class NoteDetailActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_save -> {
-                saveNote()
-                return true
+        Log.i("ITEMID", "${item}")
+            when (item.itemId) {
+                R.id.action_save -> {
+                    saveNote()
+                    return true
+                }
+                R.id.action_delete -> {
+                    showConfirmDeleteNoteDialog()
+                    return true
+                }
+                else -> return super.onOptionsItemSelected(item)
             }
-            R.id.action_delete -> {
-                showConfirmDeleteNoteDialog()
-                return true
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
     }
     private fun showConfirmDeleteNoteDialog() {
+        Log.i("DELETE note INDEX", "${noteIndex}")
         val confirmFragment = note.title?.let { ConfirmDeleteNoteFragment(it) }
         confirmFragment?.listner = object : ConfirmDeleteNoteFragment.ConfirmDeleteDialogueListner{
             override fun onDialoguePositiveClick() {
-                deleteNote()
+                    deleteNote()
             }
 
             override fun onDialogueNegativeClick() {}
         }
-        confirmFragment?.show(supportFragmentManager, "confirmDeleteDialog")
+        if (noteIndex != -1) {
+            confirmFragment?.show(supportFragmentManager, "confirmDeleteDialog")
+        }
     }
 
     fun saveNote() {

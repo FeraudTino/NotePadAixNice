@@ -21,7 +21,6 @@
         android:layout_below="@id/toolbar"
         style="@style/NoteTitleFont"
         android:hint="Titre de la note"
-
         />
     <EditText
         android:id="@+id/text_view_detail"

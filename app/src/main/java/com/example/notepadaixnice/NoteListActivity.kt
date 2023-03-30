@@ -59,12 +59,12 @@ class NoteListActivity : AppCompatActivity(), View.OnClickListener {
                 saveNote(note, noteIndex)
             }
             NoteDetailActivity.ACTION_DELETE_NOTE -> {
-                deletNote(noteIndex)
+                deleteNote(noteIndex)
             }
         }
     }
 
-    private fun deletNote(noteIndex: Int) {
+    private fun deleteNote(noteIndex: Int) {
         if(noteIndex < 0) {
             return
         }
