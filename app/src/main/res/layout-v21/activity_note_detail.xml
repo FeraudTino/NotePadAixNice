@@ -13,7 +13,7 @@
         android:background="?android:attr/colorPrimary"
         app:title="Détail de ma note"
         />
-
+    
     <EditText
         android:id="@+id/title_view_detail"
         android:layout_width="match_parent"
@@ -21,14 +21,15 @@
         android:layout_below="@id/toolbar"
         style="@style/NoteTitleFont"
         android:hint="Titre de la note"
+
         />
     <EditText
         android:id="@+id/text_view_detail"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/title"
+        android:layout_below="@id/title_view_detail"
         android:hint="Détail de la note"
         style="@style/DetailStyle"
-        tools:ignore="NotSibling" />
+         />
 
 </RelativeLayout>
